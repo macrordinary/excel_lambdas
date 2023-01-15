@@ -1,0 +1,38 @@
+/*
+Commissions calculation - used for Excel Summit 2023
+
+*/
+
+Commissions = LAMBDA(
+	sales,
+	salestier,
+	alltiers,
+	commrange,
+	commgrid,
+	SUM(
+		LET(
+			selectedcol, 
+			CHOOSECOLS(
+				commgrid, 
+				MATCH(salestier, alltiers, 0)
+			), 
+			commpayout, HSTACK(commrange, selectedcol), 
+			BYROW(
+				commpayout, 
+				LAMBDA(
+					row, 
+					LET(
+						lbound, CHOOSECOLS(row, 1), 
+						ubound, CHOOSECOLS(row, 2), 
+						currrate, CHOOSECOLS(row, 3), 
+						IFS(
+							sales > ubound, (ubound - lbound) * currrate, 
+							sales < lbound, 0, 
+							TRUE(), (sales - lbound) * currrate
+						)
+					)
+				)
+			)
+		)
+	)
+)
